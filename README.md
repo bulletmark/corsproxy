@@ -8,10 +8,11 @@ header has the _Access-Control-Allow-Origin_ field set to get around
 [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
 restrictions.
 
-Why another CORS proxy program? Existing CORS proxies I found require
-the originating client to specify the target host within the incoming
-URL to the proxy. The proxy dynamically extracts the target host and
-then sends the "real" URL to the target. [My application use
+Why another CORS proxy program? [Existing CORS
+proxies](https://github.com/search?q=cors+proxy) I found require the
+originating client to specify the target host within the incoming URL to
+the proxy. The proxy dynamically extracts the target host and then sends
+the "real" URL to the target. [My application use
 case](http://fronius-powermon.duckdns.org) only allowed me to change the
 host so I could not "embed" the real host in the target URL. This simple
 CORS proxy must be statically pre-configured with the target server so
