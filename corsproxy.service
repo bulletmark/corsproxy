@@ -1,0 +1,11 @@
+[Unit]
+Description=CORS Proxy Service
+
+[Service]
+User=#USER#
+# Set the following to the source program directory (where you git cloned)
+WorkingDirectory=#PROGDIR#
+ExecStart=#PROGDIR#/%p
+
+[Install]
+WantedBy=default.target

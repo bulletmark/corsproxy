@@ -1,0 +1,65 @@
+#!env/bin/python -u
+'''
+Provides a simple CORS proxy for GET requests. Reads list of target
+port:host[:targetport] from the command line, or from your config file.
+'''
+import os, sys, argparse
+from pathlib import Path
+import meinheld, httpx
+from bottle import Bottle, request, response
+
+# Get location of optional conf file
+PROG = Path(sys.argv[0]).stem
+CONFFILE = Path(os.getenv('XDG_CONFIG_HOME', '~/.config')).expanduser() / PROG
+
+# Process command line options
+opt = argparse.ArgumentParser(description=__doc__.strip())
+opt.add_argument('targets', nargs='*',
+        help='1 or more proxy target hosts in port:host[:targetport] '
+        'format. if not set then will try to read from '
+        '~/.config/{} file.'.format(PROG))
+args = opt.parse_args()
+
+targets = args.targets
+
+if not targets:
+    if CONFFILE.exists():
+        targets = CONFFILE.read_text().strip().split()
+    if not targets:
+        opt.error('No target host mappings defined')
+
+for t in targets:
+    if ':' not in t:
+        opt.error('Require port:host in entry "{}"'.format(t))
+    if len(t.split(':')) > 3:
+        opt.error('Invalid entry "{}"'.format(t))
+
+meinheld.set_access_logger(None)
+app = Bottle()
+
+mytarget = None
+
+@app.get('/<path:path>')
+def index(path):
+    response.set_header('Access-Control-Allow-Origin', '*')
+    r = httpx.get('http://{}/{}'.format(mytarget, path), params=request.query)
+    return r.raise_for_status() or r.json()
+
+def run(target):
+    global mytarget
+    port, host = target.split(':', maxsplit=1)
+    mytarget = host
+    print('Starting proxy for {} -> {}'.format(port, host))
+    app.run(host='0.0.0.0', port=port, server='meinheld', quiet=True)
+
+# Just run in same process if only 1 process needed, i.e. only have one
+# proxy service configured
+if len(targets) > 1:
+    import multiprocessing
+    for t in targets:
+        multiprocessing.Process(target=run, args=(t, )).start()
+
+    for p in multiprocessing.active_children():
+        p.join()
+else:
+    run(targets[0])
