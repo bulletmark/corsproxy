@@ -40,10 +40,17 @@ app = Bottle()
 mytarget = None
 
 @app.get('/<path:path>')
-def index(path):
+def get(path):
     response.set_header('Access-Control-Allow-Origin', '*')
-    r = httpx.get('http://{}/{}'.format(mytarget, path), params=request.query)
-    return r.raise_for_status() or r.json()
+    r = httpx.get('http://{}/{}'.format(mytarget, path), params=request.GET)
+    return r.raise_for_status() or r.content
+
+@app.post('/<path:path>')
+def post(path):
+    response.set_header('Access-Control-Allow-Origin', '*')
+    r = httpx.post('http://{}/{}'.format(mytarget, path),
+            params=request.GET, data=request.POST)
+    return r.raise_for_status() or r.content
 
 def run(target):
     global mytarget

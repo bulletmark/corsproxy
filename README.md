@@ -1,11 +1,11 @@
 ### Simple CORS Proxy
 
 [Corsproxy][REPO] is a very small and simple Linux HTTP server
-application which receives API GET requests on a port and forwards
-those requests to a pre-configured target server and port. The proxy
-receives JSON replies and returns them to the original client unaltered
-except that the HTTP header has the _Access-Control-Allow-Origin_ field
-set to get around
+application which receives HTTP GET or POST requests on a port and
+forwards those requests to a pre-configured target server and port. The
+proxy receives HTTP replies and returns them to the original client
+unaltered except that the HTTP header has the
+_Access-Control-Allow-Origin_ field set to get around
 [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
 restrictions.
 
