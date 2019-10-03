@@ -26,5 +26,10 @@ if [[ $# -ne 0 ]]; then
     usage
 fi
 
+ARM=""
+if uname -m | grep -q arm; then
+    ARM="-arm"
+fi
+
 export DOCKER_BUILDKIT
-docker build -t bulletmark/corsproxy . $BUILDARGS
+docker build -t bulletmark/corsproxy$ARM . $BUILDARGS
