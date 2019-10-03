@@ -28,8 +28,8 @@ to host 192.168.1.1 on port 9000.
 
 This runs 2 proxies. It will do as the previous example but will also
 independently receive requests on port 8001 and forward them to host
-192.168.1.2 on port 9001. You can specify as many independent proxy
-mappings as you want.
+192.168.1.2 on port 9001. You can specify as many proxy mappings as you
+want.
 
 Instead of specifying the target mappings on the command line as above,
 you can instead choose to configure them in your `~/.config/corsproxy`
