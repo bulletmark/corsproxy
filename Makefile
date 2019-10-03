@@ -15,5 +15,8 @@
 check:
 	flake8 corsproxy
 
+docker:
+	./docker.sh -k
+
 clean:
 	rm -rf *.pyc  __pycache__

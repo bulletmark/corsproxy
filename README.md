@@ -48,7 +48,6 @@ Requires Python 3.5 or later on a Linux server (I use a Raspberry Pi). A
 service](https://www.freedesktop.org/software/systemd/man/systemd.service.html)
 service file is provided to start the application at system startup.
 
-```shell
 git clone https://github.com/bulletmark/corsproxy
 cd corsproxy
 python3 -m venv env
@@ -57,7 +56,6 @@ mkdir -p ~/.config
 vim ~/.config/corsproxy # Add the target servers
 sudo cp corsproxy.service /etc/systemd/system
 sudo vim /etc/systemd/system/corsproxy.service # Edit #TEMPLATE# values.
-```
 
 ### STARTING, STOPPING, AND STATUS
 
@@ -67,44 +65,38 @@ can use the following commands.
 
 To enable starting at boot and also start immediately:
 
-```shell
-sudo systemctl enable corsproxy
-sudo systemctl start corsproxy
-```
+    sudo systemctl enable corsproxy
+    sudo systemctl start corsproxy
 
 To stop immediately and also disable starting at boot:
 
-```shell
-sudo systemctl stop corsproxy
-sudo systemctl disable corsproxy
-```
+    sudo systemctl stop corsproxy
+    sudo systemctl disable corsproxy
 
 Show status:
 
-```shell
-systemctl status corsproxy
-```
+    systemctl status corsproxy
 
 Show log:
 
-```shell
-journalctl -u corsproxy
-```
+    journalctl -u corsproxy
 
 ### UPGRADE
 
 `cd` to source dir, as above. Then update the source:
 
-```shell
-git pull
-```
+    git pull
 
 Update `~/.config/corsproxy` and `/etc/systemd/system/corsproxy.service` if
 necessary. Then restart the service.
 
-```shell
-sudo systemctl restart corsproxy
-```
+    sudo systemctl restart corsproxy
+
+### DOCKER
+
+A Docker image is available on Docker Hub.
+
+    docker run -p 8000:8000 bulletmark/corsproxy 8000:192.168.1.98
 
 ### USAGE
 
