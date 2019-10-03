@@ -96,11 +96,11 @@ necessary. Then restart the service.
 
 A Docker image is available on Docker Hub:
 
-    docker run -p 8000:8000 bulletmark/corsproxy 8000:192.168.1.98
+    docker run --restart always -d -p 8000:8000 bulletmark/corsproxy 8000:192.168.1.98
 
 There is also an ARM image (e.g. for Raspberry Pi):
 
-    docker run -p 8000:8000 bulletmark/corsproxy-arm 8000:192.168.1.98
+    docker run --restart always -d -p 8000:8000 bulletmark/corsproxy-arm 8000:192.168.1.98
 
 ### USAGE
 
