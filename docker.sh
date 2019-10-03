@@ -1,6 +1,6 @@
 #!/bin/bash
-# Copy only the minimum files needed for docker build then do the docker
-# build.
+# Script to build docker image.
+# M.Blakeney, Oct 2019.
 
 usage() {
     echo "Usage: $(basename $0) [-options]"

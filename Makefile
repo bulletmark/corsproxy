@@ -14,6 +14,7 @@
 
 check:
 	flake8 corsproxy
+	shellcheck *.sh
 
 docker:
 	./docker.sh
