@@ -21,8 +21,8 @@ it knows where to forward incoming requests. E.g.
 
     ./corsproxy 8000:192.168.1.1:9000
 
-The above will receive requests received on port 8000 and forwards them
-to host 192.168.1.1 on port 9000.
+The above will receive requests on port 8000 and forward them to host
+192.168.1.1 on port 9000.
 
     ./corsproxy 8000:192.168.1.1:9000 8001:192.168.1.2:9001
 
