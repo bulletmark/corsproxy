@@ -49,6 +49,7 @@ Requires Python 3.5 or later on a Linux server (I use a Raspberry Pi). A
 service](https://www.freedesktop.org/software/systemd/man/systemd.service.html)
 service file is provided to start the application at system startup.
 
+```shell
 git clone https://github.com/bulletmark/corsproxy
 cd corsproxy
 python3 -m venv env
@@ -57,6 +58,7 @@ mkdir -p ~/.config
 vim ~/.config/corsproxy # Add the target servers
 sudo cp corsproxy.service /etc/systemd/system
 sudo vim /etc/systemd/system/corsproxy.service # Edit #TEMPLATE# values.
+```
 
 ### STARTING, STOPPING, AND STATUS
 
