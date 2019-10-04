@@ -1,7 +1,8 @@
 #!env/bin/python -u
 '''
-Provides a simple CORS proxy for GET requests. Reads list of target
-port:host[:targetport] from the command line, or from your config file.
+Provides a simple CORS proxy for GET and POST requests. Reads list of
+target port:host[:targetport] from the command line, or from your config
+file.
 '''
 import os, sys, argparse
 from pathlib import Path

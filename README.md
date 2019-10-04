@@ -108,7 +108,7 @@ There is also an ARM image (e.g. for Raspberry Pi):
 ```
 usage: corsproxy [-h] [targets [targets ...]]
 
-Provides a simple CORS proxy for GET requests. Reads list of target
+Provides a simple CORS proxy for GET and POST requests. Reads list of target
 port:host[:targetport] from the command line, or from your config file.
 
 positional arguments:
