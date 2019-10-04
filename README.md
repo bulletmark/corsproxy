@@ -39,7 +39,10 @@ convenient if you are starting the program via
 mappings are only read from the file if none are specified on the
 command line.
 
-The target port is 80 on a host mapping if you do not specify it.
+The receiving (i.e. listening) port and host/IP address must at least be
+specified in each proxy mapping. The target port is optional and is 80
+if not specified. The format, as seen in the above examples,
+is `port:host[:targetport]`.
 
 The latest version and documentation is available at
 http://github.com/bulletmark/corsproxy.
