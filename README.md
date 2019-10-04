@@ -35,7 +35,9 @@ Instead of specifying the target mappings on the command line as above,
 you can instead choose to configure them in your `~/.config/corsproxy`
 file, either space delimitered, or on individual lines, etc. This is
 convenient if you are starting the program via
-[systemd](https://www.freedesktop.org/wiki/Software/systemd/) etc.
+[systemd](https://www.freedesktop.org/wiki/Software/systemd/) etc. Proxy
+mappings are only read from the file if none are specified on the
+command line.
 
 The target port is 80 on a host mapping if you do not specify it.
 
@@ -47,7 +49,7 @@ http://github.com/bulletmark/corsproxy.
 Requires Python 3.5 or later on a Linux server (I use a Raspberry Pi). A
 [systemd
 service](https://www.freedesktop.org/software/systemd/man/systemd.service.html)
-service file is provided to start the application at system startup.
+service file is provided to start the application.
 
 ```shell
 git clone https://github.com/bulletmark/corsproxy
@@ -101,7 +103,7 @@ A Docker image is available on Docker Hub:
 
     docker run --restart always -d -p 8000:8000 bulletmark/corsproxy 8000:192.168.1.98
 
-There is also an ARM image (e.g. for Raspberry Pi):
+There is also a Docker ARM image (e.g. for Raspberry Pi):
 
     docker run --restart always -d -p 8000:8000 bulletmark/corsproxy-arm 8000:192.168.1.98
 
