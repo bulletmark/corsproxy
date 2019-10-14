@@ -43,14 +43,15 @@ mytarget = None
 @app.get('/<path:path>')
 def get(path):
     response.set_header('Access-Control-Allow-Origin', '*')
-    r = httpx.get('http://{}/{}'.format(mytarget, path), params=request.GET)
+    r = httpx.get('http://{}/{}'.format(mytarget, path),
+            params=dict(request.GET))
     return r.raise_for_status() or r.content
 
 @app.post('/<path:path>')
 def post(path):
     response.set_header('Access-Control-Allow-Origin', '*')
     r = httpx.post('http://{}/{}'.format(mytarget, path),
-            params=request.GET, data=request.POST)
+            params=dict(request.GET), data=dict(request.POST))
     return r.raise_for_status() or r.content
 
 def run(target):
