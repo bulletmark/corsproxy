@@ -61,7 +61,8 @@ def run(target):
     print('Starting proxy for {} -> {}'.format(port, host))
     app.run(host='0.0.0.0', port=port, server='meinheld', quiet=True)
 
-# Just run in same process if we only have proxy service configured
+# Just run in same process if we only have a single proxy service
+# configured. Otherwise create and start a process for each service.
 if len(targets) > 1:
     import multiprocessing
     for t in targets:
