@@ -12,9 +12,12 @@
 # General Public License at <http://www.gnu.org/licenses/> for more
 # details.
 
+NAME = corsproxy
+
 check:
-	flake8 corsproxy
+	flake8 $(NAME)
 	shellcheck *.sh
+	vermin -i -q $(NAME)
 
 docker:
 	./docker.sh
