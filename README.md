@@ -57,8 +57,8 @@ service file is provided to start the application.
 ```shell
 git clone https://github.com/bulletmark/corsproxy
 cd corsproxy
-python3 -m venv env
-env/bin/pip install -r requirements.txt
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt
 mkdir -p ~/.config
 vim ~/.config/corsproxy # Add the target servers
 sudo cp corsproxy.service /etc/systemd/system

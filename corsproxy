@@ -1,4 +1,4 @@
-#!env/bin/python -u
+#!venv/bin/python -u
 '''
 Provides a simple CORS proxy for GET and POST requests. Reads list of
 target port:host[:targetport] from the command line, or from your config
