@@ -16,8 +16,8 @@ the proxy. The proxy dynamically extracts the target host and then sends
 the "real" URL to the target. [My application use
 case](http://fronius-powermon.duckdns.org) only allowed me to change the
 host so I could not "embed" the real host in the target URL. This simple
-CORS proxy must be statically pre-configured with the target server so
-it knows where to forward incoming requests. E.g.
+CORS proxy must instead be statically pre-configured with the target
+server so it knows where to forward incoming requests. E.g.
 
     ./corsproxy 8000:192.168.1.1:9000
 
@@ -27,9 +27,9 @@ The above will receive requests on port 8000 and forward them to host
     ./corsproxy 8000:192.168.1.1:9000 8001:192.168.1.2:9001
 
 This runs 2 proxies. It will do as the previous example but will also
-independently receive requests on port 8001 and forward them to host
-192.168.1.2 on port 9001. You can specify as many proxy mappings as you
-want.
+independently and asyncronously receive requests on port 8001 and
+forward them to host 192.168.1.2 on port 9001. You can specify as many
+proxy mappings as you want.
 
 Instead of specifying the target mappings on the command line as above,
 you can instead choose to configure them in your `~/.config/corsproxy`
