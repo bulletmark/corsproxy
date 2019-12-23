@@ -1,7 +1,7 @@
 ### Simple CORS Proxy
 
-[Corsproxy][REPO] is a very small and simple Linux HTTP server
-application which receives HTTP GET or POST requests on a port and
+[Corsproxy][REPO] is a very small and simple but highly performant Linux
+HTTP server which receives HTTP GET or POST requests on a port and
 forwards those requests to a pre-configured target server and port. The
 proxy receives HTTP replies and returns them to the original client
 unaltered except that the HTTP header has the
@@ -109,34 +109,6 @@ A Docker image is available on Docker Hub:
 There is also a Docker ARM image (e.g. for Raspberry Pi):
 
     docker run --restart always -d -p 8000:8000 bulletmark/corsproxy-arm 8000:192.168.1.98
-
-### PERFORMANCE AND MULTIPLE CLIENTS
-
-This is a simple and highly performant web server but each server
-instance is single threaded and blocking. If you desire to use it at
-high frequency with multiple parallel requesting clients then you are
-better off creating an independent proxy mapping for each client.
-
-For example, say you have 2 clients both independently fetching data
-every second in parallel from:
-
-    http://192.168.1.98/solar_api/v1/GetPowerFlowRealtimeData.fcgi
-
-To proxy wrap this, run your `corsproxy` (say on `192.168.1.100`) with 2
-proxy mappings as:
-
-    ./corsproxy 8000:192.168.1.98 8001:192.168.1.98
-
-Then set one client to fetch from:
-
-    http://192.168.1.100:8000/solar_api/v1/GetPowerFlowRealtimeData.fcgi
-
-and the other client to fetch from:
-
-    http://192.168.1.100:8001/solar_api/v1/GetPowerFlowRealtimeData.fcgi
-
-This effectively runs 2 independent highly performant server instances
-in separate processes.
 
 ### USAGE
 

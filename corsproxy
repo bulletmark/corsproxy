@@ -4,9 +4,10 @@ Provides a simple CORS proxy for GET and POST requests. Reads list of
 target port:host[:targetport] from the command line, or from your config
 file.
 '''
+from gevent import monkey; monkey.patch_all() # noqa :E702
 import os, sys, argparse
 from pathlib import Path
-import meinheld, requests
+import requests
 from bottle import Bottle, request, response
 
 # Get location of optional conf file
@@ -35,7 +36,6 @@ for t in targets:
     if len(t.split(':')) > 3:
         opt.error('Invalid entry "{}"'.format(t))
 
-meinheld.set_access_logger(None)
 app = Bottle()
 
 mytarget = None
@@ -59,7 +59,7 @@ def run(target):
     port, host = target.split(':', maxsplit=1)
     mytarget = host
     print('Starting proxy for {} -> {}'.format(port, host))
-    app.run(host='0.0.0.0', port=port, server='meinheld', quiet=True)
+    app.run(host='0.0.0.0', port=port, server='gevent', quiet=True)
 
 # Just run in same process if we only have a single proxy service
 # configured. Otherwise create and start a process for each service.

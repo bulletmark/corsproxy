@@ -17,7 +17,7 @@ NAME = corsproxy
 check:
 	flake8 $(NAME)
 	shellcheck *.sh
-	vermin -i -q $(NAME)
+	vermin -i -q --no-tips $(NAME)
 
 docker:
 	./docker.sh
