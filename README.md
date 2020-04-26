@@ -1,19 +1,19 @@
 ### Simple CORS Proxy
 
 [Corsproxy][REPO] is a very small and simple but highly performant Linux
-HTTP server which receives HTTP GET or POST requests on a port and
-forwards those requests to a pre-configured target server and port. The
-proxy receives HTTP replies and returns them to the original client
-unaltered except that the HTTP header has the
-_Access-Control-Allow-Origin_ field set to get around
+HTTP proxy server which receives a HTTP GET or POST request on a port
+and forwards that request to a pre-configured target server and port.
+The proxy server then receives the HTTP reply from that server, and
+returns it to the original client unaltered except that the HTTP header
+has the _Access-Control-Allow-Origin_ field set to get around
 [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
 restrictions.
 
 Why another CORS proxy program? [Existing CORS
 proxies](https://github.com/search?q=cors+proxy) I found require the
 originating client to specify the target host within the incoming URL to
-the proxy. The proxy dynamically extracts the target host and then sends
-the "real" URL to the target. [My application use
+the proxy. The proxy dynamically extracts the target host from the URL
+and then sends the "real" URL to the target. [My application use
 case](http://fronius-powermon.duckdns.org) only allowed me to change the
 host so I could not "embed" the real host in the target URL. This simple
 CORS proxy must instead be statically pre-configured with the target
