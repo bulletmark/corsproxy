@@ -27,13 +27,13 @@ The above will receive requests on port 8000 and forward them to host
     ./corsproxy 8000:192.168.1.1:9000 8001:192.168.1.2:9001
 
 This runs 2 proxies. It will do as the previous example but will also
-independently and asyncronously receive requests on port 8001 and
+independently and asynchronously receive requests on port 8001 and
 forward them to host 192.168.1.2 on port 9001. You can specify as many
 proxy mappings as you want.
 
 Instead of specifying the target mappings on the command line as above,
 you can instead choose to configure them in your `~/.config/corsproxy`
-file, either space delimitered, or on individual lines, etc. This is
+file, either space delimited, or on individual lines, etc. This is
 convenient if you are starting the program via
 [systemd](https://www.freedesktop.org/wiki/Software/systemd/) etc. Proxy
 mappings are only read from the file if none are specified on the
@@ -49,10 +49,13 @@ http://github.com/bulletmark/corsproxy.
 
 ### INSTALLATION
 
-Requires Python 3.5 or later on a Linux server (I use a Raspberry Pi). A
-[systemd
+Requires Python 3.5 or later on a Linux server (I use a Raspberry Pi).
+
+These instructions assume you are using
+[systemd](https://www.freedesktop.org/wiki/Software/systemd/) to start
+the application. A [systemd
 service](https://www.freedesktop.org/software/systemd/man/systemd.service.html)
-service file is provided to start the application.
+service file is provided.
 
 ```shell
 git clone https://github.com/bulletmark/corsproxy
@@ -66,10 +69,6 @@ sudo vim /etc/systemd/system/corsproxy.service # Edit #TEMPLATE# values.
 ```
 
 ### STARTING, STOPPING, AND STATUS
-
-If you are starting this program via
-[systemd](https://www.freedesktop.org/wiki/Software/systemd/) then you
-can use the following commands.
 
 To enable starting at boot and also start immediately:
 
@@ -91,7 +90,7 @@ Show log:
 
 ### UPGRADE
 
-`cd` to source dir, as above. Then update the source:
+`cd` to source directory, as above. Then update the source:
 
     git pull
 
@@ -101,6 +100,13 @@ necessary. Then restart the service.
     sudo systemctl restart corsproxy
 
 ### DOCKER
+
+Alternatively, you can run this application using
+[Docker](https://www.docker.com/get-started). Ensure Docker is
+[installed](https://docs.docker.com/engine/install/) and enabled to
+automatically start at boot. [Add your
+user](https://docs.docker.com/engine/install/linux-postinstall/) to the `docker`
+group.
 
 A Docker image is available on Docker Hub:
 
