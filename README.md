@@ -101,12 +101,13 @@ necessary. Then restart the service.
 
 ### DOCKER
 
-Alternatively, you can run this application using
+Alternatively, you can install and run this application using
 [Docker](https://www.docker.com/get-started). Ensure Docker is
 [installed](https://docs.docker.com/engine/install/) and enabled to
-automatically start at boot. [Add your
-user](https://docs.docker.com/engine/install/linux-postinstall/) to the `docker`
-group.
+automatically start at boot. It will restart corsproxy when your system
+starts. Ensure you [add your
+user](https://docs.docker.com/engine/install/linux-postinstall/) to the
+`docker` group.
 
 A Docker image is available on Docker Hub:
 

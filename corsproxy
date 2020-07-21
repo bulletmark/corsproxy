@@ -5,7 +5,9 @@ target port:host[:targetport] from the command line, or from your config
 file.
 '''
 from gevent import monkey; monkey.patch_all() # noqa :E702
-import os, sys, argparse
+import os
+import sys
+import argparse
 from pathlib import Path
 import requests
 from bottle import Bottle, request, response
@@ -13,6 +15,20 @@ from bottle import Bottle, request, response
 # Get location of optional conf file
 PROG = Path(sys.argv[0]).stem
 CONFFILE = Path(os.getenv('XDG_CONFIG_HOME', '~/.config')).expanduser() / PROG
+
+def check_targets(targets):
+    'Do some sanity checking on user specified target mappings'
+    ports = set()
+    for t in targets:
+        if ':' not in t:
+            sys.exit('Require port:host in entry "{}"'.format(t))
+        vals = t.split(':')
+        if len(vals) > 3:
+            sys.exit('Invalid entry "{}"'.format(t))
+        port = vals[0]
+        if port in ports:
+            sys.exit('Listening port {} specified more than once'.format(port))
+        ports.add(port)
 
 # Process command line options
 opt = argparse.ArgumentParser(description=__doc__.strip())
@@ -30,11 +46,7 @@ if not targets:
     if not targets:
         opt.error('No target host mappings defined')
 
-for t in targets:
-    if ':' not in t:
-        opt.error('Require port:host in entry "{}"'.format(t))
-    if len(t.split(':')) > 3:
-        opt.error('Invalid entry "{}"'.format(t))
+check_targets(targets)
 
 app = Bottle()
 
