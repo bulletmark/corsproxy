@@ -1,11 +1,19 @@
 #!/bin/bash
-# Script to build docker image.
-# M.Blakeney, Oct 2019.
+# Script to build docker images (for all supported architectures).
+# M.Blakeney, Jul 2020.
 
-ARM=""
-if uname -m | grep -q arm; then
-    ARM="-arm"
+export DOCKER_CLI_EXPERIMENTAL=enabled
+
+name=$(basename $PWD)
+
+if ! docker buildx use $name 2>/dev/null; then
+    docker buildx create --name $name --use
 fi
 
-export DOCKER_BUILDKIT=1
-exec docker build -t bulletmark/corsproxy$ARM:latest . "$@"
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+exec docker buildx build \
+    --push \
+    --platform=linux/amd64 \
+    --platform=linux/arm64 \
+    --platform=linux/arm \
+    -t bulletmark/corsproxy:latest . "$@"

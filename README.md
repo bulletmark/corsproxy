@@ -1,6 +1,6 @@
 ### Simple CORS Proxy
 
-[Corsproxy][REPO] is a very small and simple but highly performant Linux
+[Corsproxy][REPO] is a very small and simple but highly efficient Linux
 HTTP proxy server which receives a HTTP GET or POST request on a port
 and forwards that request to a pre-configured target server and port.
 The proxy server then receives the HTTP reply from that server, and
@@ -101,21 +101,25 @@ necessary. Then restart the service.
 
 ### DOCKER
 
-Alternatively, you can install and run this application using
-[Docker](https://www.docker.com/get-started). Ensure Docker is
+Alternatively, for many users it may be easier to install and run this
+application using [Docker](https://www.docker.com/get-started). Follow
+your linux distribution's instructions to ensure Docker is
 [installed](https://docs.docker.com/engine/install/) and enabled to
-automatically start at boot. It will restart corsproxy when your system
-starts. Ensure you [add your
+automatically start at boot. Also ensure you [add your
 user](https://docs.docker.com/engine/install/linux-postinstall/) to the
 `docker` group.
 
-A Docker image is available on Docker Hub:
+The Docker image is available on [Docker
+Hub](https://hub.docker.com/repository/docker/bulletmark/corsproxy). Run
+the following command:
 
     docker run --restart always -d -p 8000:8000 bulletmark/corsproxy 8000:192.168.1.98
 
-There is also a Docker ARM image (e.g. for Raspberry Pi):
-
-    docker run --restart always -d -p 8000:8000 bulletmark/corsproxy-arm 8000:192.168.1.98
+Be sure to change the target host mapping to what you require. The image
+is available for amd64, arm64, and arm/v7 architectures. E.g. on a
+standard PC, or on a Raspberry Pi, just run the above single command and
+docker will download, install, and run the appropriate image. Docker
+will also restart the corsproxy container when your system starts.
 
 ### USAGE
 
