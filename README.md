@@ -103,7 +103,7 @@ necessary. Then restart the service.
 
 Alternatively, for many users it may be easier to install and run this
 application using [Docker](https://www.docker.com/get-started). Follow
-your linux distribution's instructions to ensure Docker is
+your Linux distribution's instructions to ensure Docker is
 [installed](https://docs.docker.com/engine/install/) and enabled to
 automatically start at boot. Also ensure you [add your
 user](https://docs.docker.com/engine/install/linux-postinstall/) to the
