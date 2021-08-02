@@ -52,19 +52,31 @@ app = Bottle()
 
 mytarget = None
 
-@app.get('/<path:path>')
+METHODS = ['GET', 'POST', 'OPTIONS']
+POST_HEADERS = {
+    'Access-Control-Allow-Methods': ', '.join(METHODS),
+    'Access-Control-Allow-Headers': 'Content-Type, '
+    'Access-Control-Allow-Headers, Authorization, X-Requested-With',
+}
+
+@app.get('/<path:path>', method=METHODS)
 def get(path):
     response.set_header('Access-Control-Allow-Origin', '*')
-    r = requests.get('http://{}/{}'.format(mytarget, path),
-            params=dict(request.GET))
-    return r.raise_for_status() or r.content
+    if request.method == 'GET':
+        r = requests.get('http://{}/{}'.format(mytarget, path),
+                params=dict(request.GET))
+    else:
+        for k, v in POST_HEADERS.items():
+            response.set_header(k, v)
 
-@app.post('/<path:path>')
-def post(path):
-    response.set_header('Access-Control-Allow-Origin', '*')
-    r = requests.post('http://{}/{}'.format(mytarget, path),
-            params=dict(request.GET), data=dict(request.POST))
-    return r.raise_for_status() or r.content
+        if request.method == 'OPTIONS':
+            return
+
+        r = requests.post('http://{}/{}'.format(mytarget, path),
+                params=dict(request.GET), data=dict(request.POST))
+
+    response.status = r.status_code
+    return r.text
 
 def run(target):
     global mytarget
