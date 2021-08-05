@@ -63,8 +63,9 @@ POST_HEADERS = {
 def get(path):
     response.set_header('Access-Control-Allow-Origin', '*')
     qstring = request.query_string
-    qstring = '?{}'.format(qstring) if qstring else ''
-    url = 'http://{}/{}{}'.format(mytarget, path, qstring)
+    qstring = ('?' + qstring) if qstring else ''
+    path = ('/' + path) if path else ''
+    url = '{}://{}{}{}'.format(request.urlparts[0], mytarget, path, qstring)
     ct = request.content_type
     header = {'Content-Type': ct} if ct else None
 
@@ -81,6 +82,10 @@ def get(path):
 
     response.status = r.status_code
     return r.text
+
+@app.get('/', method=METHODS)
+def getroot():
+    return get(None)
 
 def run(target):
     global mytarget
