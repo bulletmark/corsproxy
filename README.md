@@ -1,4 +1,7 @@
 ### Simple CORS Proxy
+[![docker-amd64](https://img.shields.io/docker/v/bulletmark/corsproxy?arch=amd64&label=docker-amd64)](https://hub.docker.com/repository/docker/bulletmark/corsproxy)
+[![docker-arm64](https://img.shields.io/docker/v/bulletmark/corsproxy?arch=arm64&label=docker-arm64)](https://hub.docker.com/repository/docker/bulletmark/corsproxy)
+[![docker-arm/v7](https://img.shields.io/docker/v/bulletmark/corsproxy?arch=arm&label=docker-arm/v7)](https://hub.docker.com/repository/docker/bulletmark/corsproxy)
 
 [Corsproxy][REPO] is a very small and simple but highly efficient Linux
 HTTP proxy server which receives a HTTP GET or POST request on a port
