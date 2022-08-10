@@ -13,21 +13,21 @@ import requests
 from bottle import Bottle, request, response
 
 # Get location of optional conf file
-PROG = Path(sys.argv[0]).stem
-CONFFILE = Path(os.getenv('XDG_CONFIG_HOME', '~/.config')).expanduser() / PROG
+CONFFILE = Path(os.getenv('XDG_CONFIG_HOME', '~/.config'),
+        Path(sys.argv[0]).stem).expanduser()
 
 def check_targets(targets):
     'Do some sanity checking on user specified target mappings'
     ports = set()
     for t in targets:
         if ':' not in t:
-            sys.exit('Require port:host in entry "{}"'.format(t))
+            sys.exit(f'Require port:host in entry "{t}"')
         vals = t.split(':')
         if len(vals) > 3:
-            sys.exit('Invalid entry "{}"'.format(t))
+            sys.exit(f'Invalid entry "{t}"')
         port = vals[0]
         if port in ports:
-            sys.exit('Listening port {} specified more than once'.format(port))
+            sys.exit(f'Listening port {port} specified more than once')
         ports.add(port)
 
 # Process command line options
@@ -35,7 +35,7 @@ opt = argparse.ArgumentParser(description=__doc__.strip())
 opt.add_argument('targets', nargs='*',
         help='1 or more proxy target hosts in port:host[:targetport] '
         'format. if not set then will try to read from '
-        '~/.config/{} file.'.format(PROG))
+        f'{CONFFILE} file.')
 args = opt.parse_args()
 
 targets = args.targets
@@ -65,7 +65,7 @@ def get(path):
     qstring = request.query_string
     qstring = ('?' + qstring) if qstring else ''
     path = ('/' + path) if path else ''
-    url = '{}://{}{}{}'.format(request.urlparts[0], mytarget, path, qstring)
+    url = f'{request.urlparts[0]}://{mytarget}{path}{qstring}'
     ct = request.content_type
     header = {'Content-Type': ct} if ct else None
 
@@ -91,7 +91,7 @@ def run(target):
     global mytarget
     port, host = target.split(':', maxsplit=1)
     mytarget = host
-    print('Starting proxy for {} -> {}'.format(port, host))
+    print(f'Starting proxy for {port} -> {host}')
     app.run(host='0.0.0.0', port=port, server='gevent', quiet=True)
 
 # Just run in same process if we only have a single proxy service
