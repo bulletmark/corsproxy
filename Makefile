@@ -22,5 +22,8 @@ check:
 docker:
 	./docker.sh
 
+doc:
+	update-readme-usage
+
 clean:
 	rm -rf *.pyc  __pycache__

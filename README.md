@@ -1,4 +1,4 @@
-### Simple CORS Proxy
+## Simple CORS Proxy
 [![docker-amd64](https://img.shields.io/docker/v/bulletmark/corsproxy?arch=amd64&label=docker-amd64)](https://hub.docker.com/repository/docker/bulletmark/corsproxy)
 [![docker-arm64](https://img.shields.io/docker/v/bulletmark/corsproxy?arch=arm64&label=docker-arm64)](https://hub.docker.com/repository/docker/bulletmark/corsproxy)
 [![docker-arm/v7](https://img.shields.io/docker/v/bulletmark/corsproxy?arch=arm&label=docker-arm/v7)](https://hub.docker.com/repository/docker/bulletmark/corsproxy)
@@ -50,7 +50,7 @@ is `port:host[:targetport]`.
 The latest version and documentation is available at
 http://github.com/bulletmark/corsproxy.
 
-### INSTALLATION
+## INSTALLATION
 
 Requires Python 3.5 or later on a Linux server (I use a Raspberry Pi).
 
@@ -71,7 +71,7 @@ sudo cp corsproxy.service /etc/systemd/system
 sudo vim /etc/systemd/system/corsproxy.service # Edit #TEMPLATE# values.
 ```
 
-### STARTING, STOPPING, AND STATUS
+## STARTING, STOPPING, AND STATUS
 
 To enable starting at boot and also start immediately:
 
@@ -91,7 +91,7 @@ Show log:
 
     journalctl -u corsproxy
 
-### UPGRADE
+## UPGRADE
 
 `cd` to source directory, as above. Then update the source:
 
@@ -102,7 +102,7 @@ necessary. Then restart the service.
 
     sudo systemctl restart corsproxy
 
-### DOCKER
+## DOCKER
 
 Alternatively, for many users it may be easier to install and run this
 application using [Docker](https://www.docker.com/get-started). Follow
@@ -124,23 +124,26 @@ standard PC, or on a Raspberry Pi, just run the above single command and
 docker will download, install, and run the appropriate image. Docker
 will also restart the corsproxy container when your system starts.
 
-### USAGE
+## USAGE
+
+Type `corsproxy -h` to view the following usage summary:
 
 ```
-usage: corsproxy [-h] [targets [targets ...]]
+usage: corsproxy [-h] [targets ...]
 
 Provides a simple CORS proxy for GET and POST requests. Reads list of target
 port:host[:targetport] from the command line, or from your config file.
 
 positional arguments:
   targets     1 or more proxy target hosts in port:host[:targetport] format.
-              if not set then will try to read from ~/.config/corsproxy file.
+              if not set then will try to read from
+              ~/.config/corsproxy file.
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
 ```
 
-### LICENSE
+## LICENSE
 
 Copyright (C) 2019 Mark Blakeney. This program is distributed under the
 terms of the GNU General Public License.
