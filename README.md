@@ -68,7 +68,7 @@ venv/bin/pip install -r requirements.txt
 mkdir -p ~/.config
 vim ~/.config/corsproxy # Add the target servers
 sudo cp corsproxy.service /etc/systemd/system
-sudo vim /etc/systemd/system/corsproxy.service # Edit #TEMPLATE# values.
+sudoedit /etc/systemd/system/corsproxy.service # Edit #TEMPLATE# values.
 ```
 
 ## STARTING, STOPPING, AND STATUS
