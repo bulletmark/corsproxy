@@ -1,4 +1,4 @@
-FROM python:3.9-slim as base
+FROM python:3.11-slim as base
 LABEL name=corsproxy maintainer="mark.blakeney@bullet-systems.net"
 
 FROM base as builder

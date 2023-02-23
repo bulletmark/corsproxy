@@ -2,13 +2,16 @@
 # Script to build docker images (for all supported architectures).
 # M.Blakeney, Jul 2020.
 
-export DOCKER_CLI_EXPERIMENTAL=enabled
-
-name=$(basename $PWD)
-
-if ! docker buildx use $name 2>/dev/null; then
-    docker buildx create --name $name --use
+# Ensure packages are installed
+if ! pacman -Q docker docker-buildx >/dev/null; then
+    exit $?
 fi
+
+if ! docker ps >/dev/null; then
+    exit $?
+fi
+
+docker buildx create --name $(basename $PWD) --use
 
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 exec docker buildx build \
