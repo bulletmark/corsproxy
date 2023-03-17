@@ -4,6 +4,7 @@ Provides a simple CORS proxy for GET and POST requests. Reads list of
 target port:host[:targetport] from the command line, or from your config
 file.
 '''
+# ruff: noqa: E402
 from gevent import monkey; monkey.patch_all() # noqa :E702
 import os
 import sys
