@@ -50,9 +50,10 @@ is `port:host[:targetport]`.
 The latest version and documentation is available at
 http://github.com/bulletmark/corsproxy.
 
-## INSTALLATION
+## Installation
 
-Requires Python 3.5 or later on a Linux server (I use a Raspberry Pi).
+Requires `python` 3.6 or later and a modern Linux `systemd` environment
+(I use a Raspberry Pi).
 
 These instructions assume you are using
 [systemd](https://www.freedesktop.org/wiki/Software/systemd/) to start
@@ -60,18 +61,35 @@ the application. A [systemd
 service](https://www.freedesktop.org/software/systemd/man/systemd.service.html)
 service file is provided.
 
-```shell
-git clone https://github.com/bulletmark/corsproxy
-cd corsproxy
-python3 -m venv venv
-venv/bin/pip install -r requirements.txt
-mkdir -p ~/.config
-vim ~/.config/corsproxy # Add the target servers
-sudo cp corsproxy.service /etc/systemd/system
-sudoedit /etc/systemd/system/corsproxy.service # Edit #TEMPLATE# values.
+1. Clone repository and create configuration:
+
+    ```shell
+    $ git clone https://github.com/bulletmark/corsproxy
+    $ cd corsproxy
+    $ mkdir -p ~/.config
+    $ vim ~/.config/corsproxy # Add your target servers
+    ```
+
+2. Create virtual environment (venv) and install service:
+
+    ```shell
+    $ python3 -m venv venv
+    $ venv/bin/pip install -r requirements.txt
+    $ sudo cp corsproxy.service /etc/systemd/system
+    $ sudoedit /etc/systemd/system/corsproxy.service # Edit #TEMPLATE# values.
+    ```
+
+Note: Alternatively, to create the venv, install the requirement
+packages, insert the template values, and enable + start the service you
+can use my [pinstall](https://github.com/bulletmark/pinstall) tool. Just
+install it and do the following in the `corsproxy` directory.
+
+```
+$ pinstall venv
+$ pinstall service
 ```
 
-## STARTING, STOPPING, AND STATUS
+## Starting, Stopping, And Status
 
 To enable starting at boot and also start immediately:
 
@@ -91,7 +109,7 @@ Show log:
 
     journalctl -u corsproxy
 
-## UPGRADE
+## Upgrade
 
 `cd` to source directory, as above. Then update the source:
 
@@ -102,7 +120,7 @@ necessary. Then restart the service.
 
     sudo systemctl restart corsproxy
 
-## DOCKER
+## Docker
 
 Alternatively, for many users it may be easier to install and run this
 application using [Docker](https://www.docker.com/get-started). Follow
@@ -124,7 +142,7 @@ standard PC, or on a Raspberry Pi, just run the above single command and
 docker will download, install, and run the appropriate image. Docker
 will also restart the corsproxy container when your system starts.
 
-## USAGE
+## Usage
 
 Type `corsproxy -h` to view the following usage summary:
 
@@ -143,7 +161,7 @@ options:
   -h, --help  show this help message and exit
 ```
 
-## LICENSE
+## License
 
 Copyright (C) 2019 Mark Blakeney. This program is distributed under the
 terms of the GNU General Public License.

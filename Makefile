@@ -15,9 +15,9 @@
 NAME = $(shell basename $(CURDIR))
 
 check:
-	flake8 $(NAME)
+	ruff $(NAME)
 	shellcheck *.sh
-	vermin -i -q --no-tips $(NAME)
+	vermin -i --no-tips $(NAME)
 
 docker:
 	./docker.sh
@@ -26,4 +26,4 @@ doc:
 	update-readme-usage
 
 clean:
-	rm -rf *.pyc  __pycache__
+	rm -rf  __pycache__
