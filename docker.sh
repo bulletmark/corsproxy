@@ -11,7 +11,10 @@ if ! docker ps >/dev/null; then
     exit $?
 fi
 
-docker buildx create --name "$(basename $PWD)" --use
+name="$(basename $PWD)"
+
+docker buildx rm $name 2>/dev/null
+docker buildx create --name $name --use
 
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 exec docker buildx build \
