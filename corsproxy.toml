@@ -1,14 +1,13 @@
 # Corsproxy example configuration file.
 # Copy this TOML file to ~/.config/ and then uncomment/edit.
 
-# The following is same as the --bind-host option. Default is:
-# bind_host = "0.0.0.0"
-
 # The following is same as the target argument. You must define (one or
 # more of) these, or add them via the command line.
+# Specify IPv6 addresses in square brackets.
 # targets = [
 #   "8000=http://192.168.1.1:8010",
-#   "8001=http://192.168.1.2:8080",
+#   "0.0.0.0:8001=http://192.168.1.2:8010",
+#   "[::]:8001=http://192.168.1.2:8010",
 # ]
 
 # vim:se syn=toml sw=2:

@@ -3,15 +3,16 @@
 [![docker-arm64](https://img.shields.io/docker/v/bulletmark/corsproxy?arch=arm64&label=docker-arm64)](https://hub.docker.com/repository/docker/bulletmark/corsproxy)
 [![docker-arm/v7](https://img.shields.io/docker/v/bulletmark/corsproxy?arch=arm&label=docker-arm/v7)](https://hub.docker.com/repository/docker/bulletmark/corsproxy)
 
-[Corsproxy](https://github.com/bulletmark/corsproxy/) is a very small
-and simple but efficient Linux HTTP proxy service which receives a HTTP
+[Corsproxy](https://github.com/bulletmark/corsproxy/) is a small,
+simple, and efficient Linux HTTP proxy service which receives a HTTP
 request (GET, POST, PUT, PATCH, DELETE, or HEAD) on a port and forwards
 that request to a pre-configured target HTTP or HTTPS server. The proxy
 service then receives the reply from that server, and returns it to the
 original client unaltered except that the HTTP header has the
 _Access-Control-Allow-Origin_ field set to get around
 [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
-restrictions.
+restrictions. It works for both IPv4 and IPv6 source and target
+addresses.
 
 Why another CORS proxy program? [Existing CORS
 proxies](https://github.com/search?q=cors+proxy) I found require the
@@ -24,17 +25,21 @@ server in the target URL. This simple CORS proxy must instead be
 statically pre-configured with the target server so it knows where to
 forward incoming requests. E.g.
 
-    ./corsproxy 8000=http://192.168.1.1:9000
+```sh
+$ ./corsproxy 8000=http://192.168.1.1:9000
+```
 
-The above will run `corsproxy` to receive requests on port 8000 and
-forward them to HTTP server 192.168.1.1:9000.
+The above will run `corsproxy` to receive requests on port `8000` and
+forward them to HTTP server `192.168.1.1:9000`.
 
-    ./corsproxy 8000=http://192.168.1.1:9000 8001=https://192.168.1.2:9000
+```sh
+$ ./corsproxy 8000=http://192.168.1.1:9000 8001=https://192.168.1.2:9000
+```
 
 This runs 2 independent proxies. It will do the same as the previous
 example but will also independently and asynchronously receive requests
-on port 8001 and forward them to HTTPS server 192.168.1.2:9000. You can
-specify as many proxy mappings as you want.
+on port `8001` and forward them to HTTPS server `192.168.1.2:9000`. You
+can specify as many proxy mappings as you want.
 
 Instead of specifying the target mappings on the command line as above,
 you can instead choose to configure them in `~/.config/corsproxy.toml`
@@ -48,10 +53,44 @@ command line.
 The receiving (i.e. listening) port and server/IP address must at least be
 specified in each proxy mapping. The target port is optional.
 The format, as seen in the above examples,
-is `port=http://server[:targetport]` or `port=https://server[:targetport]`.
+is `[host:]port=http://server[:targetport]` or `[host:]port=https://server[:targetport]`.
 
 The latest version and documentation is available at
 http://github.com/bulletmark/corsproxy.
+
+## IPv4 and IPv6 Addresses and Examples
+
+Originally this program was written for IPv4 address proxying only but
+now handles IPv6 address proxying as well. IPv6 listening and target
+hosts are specified by enclosing them in square brackets, e.g.
+`[2409:d001:4c04:3a10:4d5a:3061:db17:835]` or `[::]`.
+
+The default host address to listen for a port is `0.0.0.0` to allow all
+IPv4 connections. However, you can limit to local only (i.e. loopback)
+connections by specifying the host as `127.0.0.1`. Likewise, you can
+specify IPv6 hosts, e.g. `[::]` for all, or `[::1]` for loopback. Some
+examples follow:
+
+```sh
+# Local/loopback IPv4 address proxy:
+$ ./corsproxy 127.0.0.1:8000=http://192.168.1.1
+
+# Local/loopback IPv6 address proxy:
+$ ./corsproxy [::1]:8000=http://192.168.1.1
+
+# All IPv4 address proxy:
+$ ./corsproxy 8000=http://192.168.1.1
+# which same as:
+$ ./corsproxy 0.0.0.0:8000=http://192.168.1.1
+
+# All IPv6 address proxy:
+$ ./corsproxy [::]:8000=http://192.168.1.1
+
+# Use 2 mappings for both IPv4 and IPv6 hosts:
+# [Note that Python asyncio does not allow dual stack IPv4/IPv6 so
+# must run 2 separate mappings]
+$ ./corsproxy 8000=http://192.168.1.1 [::]:8000=http://192.168.1.1
+```
 
 ## Installation
 
@@ -66,7 +105,7 @@ service file is provided.
 
 1. Clone repository and create configuration:
 
-    ```shell
+    ```sh
     $ git clone https://github.com/bulletmark/corsproxy
     $ cd corsproxy
     $ mkdir -p ~/.config
@@ -76,7 +115,7 @@ service file is provided.
 
 2. Create virtual environment (venv) and install service:
 
-    ```shell
+    ```sh
     $ python3 -m venv venv
     $ venv/bin/pip install -r requirements.txt
     $ sudo cp corsproxy.service /etc/systemd/system
@@ -88,7 +127,7 @@ packages, insert the template values, and enable + start the service you
 can use my [pinstall](https://github.com/bulletmark/pinstall) tool. Just
 install it and do the following in the `corsproxy` directory.
 
-```
+```sh
 $ pinstall venv
 $ pinstall service
 ```
@@ -97,33 +136,45 @@ $ pinstall service
 
 To enable starting at boot and also start immediately:
 
-    sudo systemctl enable corsproxy
-    sudo systemctl start corsproxy
+```sh
+$ sudo systemctl enable corsproxy
+$ sudo systemctl start corsproxy
+```
 
 To stop immediately and also disable starting at boot:
 
-    sudo systemctl stop corsproxy
-    sudo systemctl disable corsproxy
+```sh
+$ sudo systemctl stop corsproxy
+$ sudo systemctl disable corsproxy
+```
 
 Show status:
 
-    systemctl status corsproxy
+```sh
+$ systemctl status corsproxy
+```
 
 Show log:
 
-    journalctl -u corsproxy
+```sh
+$ journalctl -u corsproxy
+```
 
 ## Upgrade
 
 `cd` to source directory, as above. Then update the source:
 
-    git pull
+```sh
+$ git pull
+```
 
 Update `~/.config/corsproxy.toml` and
 `/etc/systemd/system/corsproxy.service` if necessary. Then restart the
 service.
 
-    sudo systemctl restart corsproxy
+```sh
+$ sudo systemctl restart corsproxy
+```
 
 ## Docker
 
@@ -139,7 +190,9 @@ The Docker image is available on [Docker
 Hub](https://hub.docker.com/repository/docker/bulletmark/corsproxy). Run
 the following command:
 
-    docker run --restart always -d -p 8000:8000 bulletmark/corsproxy 8000=http://192.168.1.98
+```sh
+$ docker run --restart always -d -p 8000:8000 bulletmark/corsproxy 8000=http://192.168.1.98
+```
 
 Be sure to change the target server mapping to what you require. The image
 is available for amd64, arm64, and arm/v7 architectures. E.g. on a
@@ -152,23 +205,28 @@ will also restart the corsproxy container when your system starts.
 Type `corsproxy -h` to view the usage summary:
 
 ```
-usage: corsproxy [-h] [-d] [-b BIND_HOST] [-c CONFFILE] [targets ...]
+usage: corsproxy [-h] [-d] [-c CONFFILE] [targets ...]
 
-A simple CORS proxy. Reads list of target port=http://server[:targetport] from
-the command line, or from your config file.
+A simple CORS proxy. Reads list of target server mappings from the command
+line, or from your config file. Target server mappings are of the form
+"[host:]port=http://server[:targetport]" or
+"[host:]port=https://server[:targetport]" where "port" is the local listening
+port and "server[:targetport]" is the server (and optional target port) to
+proxy to. The default host address to listen on for a port is '0.0.0.0' to
+allow all IPv4 connections but you can specify an alternate host address for
+each server mapping, e.g. '127.0.0.1' to limit to local IPv4 connections, or
+'[::]' for all IPv6 connections, or '[::1]' to limit to local IPv6
+connections, or any specific IPv4 or IPv6 address to limit to that interface.
+E.g. to listen all IPv4 and IPv6 addresses and forward to same IPv4 server
+define 2 mappings: "0.0.0.0:8000=http://192.168.1.1"
+"[::]:8000=http://192.168.1.1".
 
 positional arguments:
-  targets               1 or more proxy target servers in format
-                        "port=http://server[:targetport]" or
-                        "port=https://server[:targetport]" where "port" is the
-                        local listening port and "server[:targetport]" is the
-                        server (and optional target port) to proxy to.
+  targets               1 or more proxy target server mappings
 
 options:
   -h, --help            show this help message and exit
   -d, --debug           enable debug output
-  -b BIND_HOST, --bind-host BIND_HOST
-                        bind listening sockets to this host, default="0.0.0.0"
   -c CONFFILE, --conffile CONFFILE
                         alternative configuration file,
                         default="~/.config/corsproxy.toml"
@@ -190,10 +248,15 @@ options:
    command line settings (presently only `--bind-host`) in addition to
    the target server mappings in that file.
 
-3. **Enhancement:** HTTP methods PUT, PATCH, DELETE, and HEAD are now
+3. **Enhancement:** IPv6 addresses can now also be specified for both
+   source and target addresses. Also, source addresses for IPv4 and IPv6
+   can be specified to limit to loopback interface only, or to a
+   specific interface.
+
+4. **Enhancement:** HTTP methods PUT, PATCH, DELETE, and HEAD are now
    supported in addition to the normal GET and POST.
 
-4. **Enhancement:** Previously I was using a home-grown implementation to
+5. **Enhancement:** Previously I was using a home-grown implementation to
    intercept and insert
    [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
    headers. This worked for my use but it may not work generally for all
@@ -203,12 +266,12 @@ options:
    is likely to be much more standards based, resilient, and general
    purpose.
 
-5. **Enhancement:** For concurrency, the code now uses Python
+6. **Enhancement:** For concurrency, the code now uses Python
    [asyncio](https://docs.python.org/3/library/asyncio.html) rather than
    [gevent/greenlet](https://greenlet.readthedocs.io/en/latest/) so it
    is slightly more performant and efficient.
 
-6. Python 3.7+ is required at a minimum. Python 3.6 no longer supported.
+7. Python 3.7+ is required at a minimum. Python 3.6 no longer supported.
 
 ## License
 

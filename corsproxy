@@ -1,11 +1,24 @@
 #!venv/bin/python -u
 '''
-A simple CORS proxy. Reads list of target port=http://server[:targetport]
-from the command line, or from your config file.
+A simple CORS proxy. Reads list of target server mappings from the
+command line, or from your config file. Target server mappings are of
+the form "[host:]port=http://server[:targetport]" or
+"[host:]port=https://server[:targetport]" where "port" is the local
+listening port and "server[:targetport]" is the server (and optional
+target port) to proxy to. The default host address to listen on for a
+port is '0.0.0.0' to allow all IPv4 connections but you can specify an
+alternate host address for each server mapping, e.g. '127.0.0.1' to
+limit to local IPv4 connections, or '[::]' for all IPv6 connections, or
+'[::1]' to limit to local IPv6 connections, or any specific IPv4 or IPv6
+address to limit to that interface. E.g. to listen all IPv4 and IPv6
+addresses and forward to same IPv4 server define 2 mappings:
+"0.0.0.0:8000=http://192.168.1.1" "[::]:8000=http://192.168.1.1".
 '''
 import argparse
 import os
+import re
 import sys
+from collections import defaultdict
 from pathlib import Path
 from typing import Iterable, List, Tuple
 from urllib.parse import urlsplit, urlunsplit
@@ -23,23 +36,33 @@ from starlette.routing import Route
 try:
     import tomllib
 except ModuleNotFoundError:
-    import tomli as tomllib
+    import tomli as tomllib  # type:ignore
 
 # Get location of optional conf file
 CNFFILE = Path(os.getenv('XDG_CONFIG_HOME', '~/.config'),
         Path(sys.argv[0]).stem + '.toml')
 
 SCHEMES = ('http://', 'https://')
-BINDHOST = '0.0.0.0'
+DEFHOST = '0.0.0.0'
 
-def parse_targets(targets: List[str]) -> Iterable[Tuple[int, str]]:
-    'Check and then yield each port, target in given list'
-    ports = set()
+def parse_targets(targets: List[str]) -> Iterable[Tuple[str, int, str]]:
+    'Check and then yield each host, port, target in given list'
+    ports = defaultdict(set)
     for t in targets:
         if '=' not in t:
-            sys.exit(f'{t}: not in port=http://server[:targetport] format.')
+            sys.exit(f'{t}: not in '
+                     '[host:]port=http://server[:targetport] format.')
 
         port, target = t.split('=', maxsplit=1)
+
+        host = DEFHOST
+        if ':' in port:
+            lhost, port = port.rsplit(':', maxsplit=1)
+
+            # Handle IPv6 addresses enclosed in "[addr]"
+            if lhost and lhost != '*':
+                host6 = re.search('\[(.+)\]', lhost)
+                host = host6.group(1) if host6 else lhost
 
         try:
             portn = int(port)
@@ -49,27 +72,20 @@ def parse_targets(targets: List[str]) -> Iterable[Tuple[int, str]]:
         if not any(target.startswith(s) for s in SCHEMES):
             sys.exit(f'{t}: target must start with {" or ".join(SCHEMES)}')
 
-        if portn in ports:
+        if portn in ports.get(host, {}):
             sys.exit(f'Listening port {portn} specified more than once.')
 
-        ports.add(portn)
-        yield portn, target
+        ports[host].add(portn)
+        yield host, portn, target
 
 # Process command line options
 opt = argparse.ArgumentParser(description=__doc__.strip())
 opt.add_argument('-d', '--debug', action='store_true',
                  help='enable debug output')
-opt.add_argument('-b', '--bind-host',
-                 help='bind listening sockets to this host, '
-                 f'default="{BINDHOST}"')
 opt.add_argument('-c', '--conffile',
                  help=f'alternative configuration file, default="{CNFFILE}"')
 opt.add_argument('targets', nargs='*',
-                 help='1 or more proxy target servers in format '
-                 '"port=http://server[:targetport]" or '
-                 '"port=https://server[:targetport]" where "port" is the '
-                 'local listening port and "server[:targetport]" is the '
-                 'server (and optional target port) to proxy to.')
+                 help='1 or more proxy target server mappings')
 
 args = opt.parse_args()
 
@@ -87,9 +103,6 @@ if conffile.exists():
         conf = tomllib.load(fp)
 else:
     conf = {}
-
-bind_host = args.bind_host if args.bind_host is not None else \
-        conf.get('bind_host', BINDHOST)
 
 # Read target definitions from file if not defined on command line
 targets = args.targets or conf.get('targets')
@@ -146,14 +159,14 @@ middleware = [Middleware(CORSMiddleware, allow_origins=['*'],
 # Create the app instance
 app = Starlette(debug=args.debug, routes=routes, middleware=middleware)
 
-def run(port: int, target: str) -> None:
+def run(host:str, port: int, target: str) -> None:
     'Runs in a thread, one for each target'
     global mytarget
     mytarget = target
-    bhost = f'[{bind_host}]' if ':' in bind_host else bind_host
-    print(f'Starting proxy for http://{bhost}:{port} -> {target}')
+    phost = f'[{host}]' if ':' in host else host
+    print(f'Starting proxy for http://{phost}:{port} -> {target}')
     log_level = 'debug' if args.debug else 'error'
-    uvicorn.run(app, host=bind_host, port=port, log_level=log_level,
+    uvicorn.run(app, host=host, port=port, log_level=log_level,
                 server_header=False, date_header=False)
 
 # Just run in same process if we only have a single proxy service
