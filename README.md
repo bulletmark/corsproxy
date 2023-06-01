@@ -92,7 +92,7 @@ $ ./corsproxy [::]:8000=http://192.168.1.1
 $ ./corsproxy 8000=http://192.168.1.1 [::]:8000=http://192.168.1.1
 
 # Forward IPv4 HTTP to IPv6 HTTPS server (on it's port 9000):
-$ ./corsproxy 8000=https://[2409:d001:4c04:3a10:4d5a:3061:db17:835]:9000`
+$ ./corsproxy 8000=https://[2409:d001:4c04:3a10:4d5a:3061:db17:835]:9000
 ```
 
 ## Installation
