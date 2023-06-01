@@ -5,14 +5,14 @@
 
 [Corsproxy](https://github.com/bulletmark/corsproxy/) is a small,
 simple, and efficient Linux HTTP proxy service which receives a HTTP
-request (GET, POST, PUT, PATCH, DELETE, or HEAD) on a port and forwards
-that request to a pre-configured target HTTP or HTTPS server. The proxy
-service then receives the reply from that server, and returns it to the
-original client unaltered except that the HTTP header has the
-_Access-Control-Allow-Origin_ field set to get around
-[CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+request on a port and forwards that request to a pre-configured target
+HTTP or HTTPS server. The proxy service then receives the reply from
+that server, and returns it to the original client unaltered except that
+the HTTP header has the _Access-Control-Allow-Origin_ field set to get
+around [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
 restrictions. It works for both IPv4 and IPv6 source and target
-addresses.
+addresses. HTTP request methods GET, POST, PUT, PATCH, DELETE, or HEAD
+are supported.
 
 Why another CORS proxy program? [Existing CORS
 proxies](https://github.com/search?q=cors+proxy) I found require the
@@ -90,6 +90,9 @@ $ ./corsproxy [::]:8000=http://192.168.1.1
 # [Note that Python asyncio does not allow dual stack IPv4/IPv6 so
 # must run 2 separate mappings]
 $ ./corsproxy 8000=http://192.168.1.1 [::]:8000=http://192.168.1.1
+
+# Forward IPv4 HTTP to IPv6 HTTPS server (on it's port 9000):
+$ ./corsproxy 8000=https://[2409:d001:4c04:3a10:4d5a:3061:db17:835]:9000`
 ```
 
 ## Installation

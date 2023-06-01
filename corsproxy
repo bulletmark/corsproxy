@@ -72,8 +72,9 @@ def parse_targets(targets: List[str]) -> Iterable[Tuple[str, int, str]]:
         if not any(target.startswith(s) for s in SCHEMES):
             sys.exit(f'{t}: target must start with {" or ".join(SCHEMES)}')
 
-        if portn in ports.get(host, {}):
-            sys.exit(f'Listening port {portn} specified more than once.')
+        if portn in ports[host]:
+            lhost = f'[{host}]' if ':' in host else host
+            sys.exit(f'Listening port {lhost}:{portn} specified more than once.')
 
         ports[host].add(portn)
         yield host, portn, target
@@ -124,37 +125,35 @@ async def get(request: Request) -> Response:
     url = urlunsplit(urlsplit(str(request.url))._replace(scheme='', netloc=''))
 
     method = request.method
+    hdr = request.headers
 
     if method == 'GET':
-        coroutine = session.get(url, headers=request.headers)
+        func = session.get(url, headers=hdr)
     elif method == 'POST':
-        coroutine = session.post(url, headers=request.headers,
-                                 data=(await request.body()))
+        func = session.post(url, headers=hdr, data=(await request.body()))
     elif method == 'PUT':
-        coroutine = session.put(url, headers=request.headers,
-                                 data=(await request.body()))
+        func = session.put(url, headers=hdr, data=(await request.body()))
     elif method == 'PATCH':
-        coroutine = session.patch(url, headers=request.headers,
-                                 data=(await request.body()))
+        func = session.patch(url, headers=hdr, data=(await request.body()))
     elif method == 'DELETE':
-        coroutine = session.delete(url, headers=request.headers)
+        func = session.delete(url, headers=hdr)
     elif method == 'HEAD':
-        coroutine = session.head(url, headers=request.headers)
+        func = session.head(url, headers=hdr)
     else:
         return Response(f'Unsupported HTML method "{method}"', 501)
 
-    async with coroutine as response:
+    async with func as response:
         # Some servers have blank chars on end of key values which
         # Starlette does not like
-        headers = CIMultiDict((k, v.strip())
-                              for k, v in response.headers.items())
-        return Response((await response.text()), response.status, headers)
+        hdr = CIMultiDict((k, v.strip())
+                          for k, v in response.headers.items())
+        return Response((await response.text()), response.status, hdr)
 
 # Set routes and middleware
 routes = [Route('/{path:path}', get, methods=('GET', 'POST', 'PUT',
                                               'PATCH', 'DELETE', 'HEAD'))]
 middleware = [Middleware(CORSMiddleware, allow_origins=['*'],
-                        allow_methods=['*'], allow_headers=['*'])]
+                         allow_methods=['*'], allow_headers=['*'])]
 
 # Create the app instance
 app = Starlette(debug=args.debug, routes=routes, middleware=middleware)
@@ -163,8 +162,10 @@ def run(host:str, port: int, target: str) -> None:
     'Runs in a thread, one for each target'
     global mytarget
     mytarget = target
+
     phost = f'[{host}]' if ':' in host else host
     print(f'Starting proxy for http://{phost}:{port} -> {target}')
+
     log_level = 'debug' if args.debug else 'error'
     uvicorn.run(app, host=host, port=port, log_level=log_level,
                 server_header=False, date_header=False)
@@ -178,5 +179,6 @@ else:
     for t in targets:
         multiprocessing.Process(target=run, args=(*t,)).start()
 
+    # Wait for termination ..
     for p in multiprocessing.active_children():
         p.join()
