@@ -98,7 +98,7 @@ $ ./corsproxy 8000=https://[2409:d001:4c04:3a10:4d5a:3061:db17:835]:9000
 ## Installation
 
 Requires `python` 3.7 or later and a modern Linux `systemd` environment
-(I use a Raspberry Pi).
+(e.g. I use Arch Linux on a Raspberry Pi).
 
 These instructions assume you are using
 [systemd](https://www.freedesktop.org/wiki/Software/systemd/) to start
@@ -247,30 +247,28 @@ options:
 
 2. **Incompatible Change:** The configuration file `~/.config/corsproxy`
    is renamed to `~/.config/corsproxy.toml` and is now
-   [TOML](https://toml.io) format because you can now configure other
-   command line settings (presently only `--bind-host`) in addition to
-   the target server mappings in that file.
+   [TOML](https://toml.io) format.
 
 3. **Enhancement:** IPv6 addresses can now also be specified for both
-   source and target addresses. Also, source addresses for IPv4 and IPv6
-   can be specified to limit to loopback interface only, or to a
-   specific interface.
+   source and target addresses, in addition to IPv4 addresses.
+   Also, source addresses for IPv4 and IPv6 can be specified to limit to
+   loopback interface only, or to a specific interface, etc.
 
 4. **Enhancement:** HTTP methods PUT, PATCH, DELETE, and HEAD are now
    supported in addition to the normal GET and POST.
 
-5. **Enhancement:** Previously I was using a home-grown implementation to
-   intercept and insert
+5. **Enhancement:** Previously I was using a home-grown implementation
+   to intercept and insert
    [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
    headers. This worked for my use but it may not work generally for all
    users so now I use the [Starlette](https://www.starlette.io/)
    middleware [CORS
    package](https://www.starlette.io/middleware/#corsmiddleware) which
-   is likely to be much more standards based, resilient, and general
-   purpose.
+   is likely to be much more standards based and robust for general use.
 
-6. **Enhancement:** For concurrency, the code now uses Python
+6. **Enhancement:** For concurrency, the code now uses native Python
    [asyncio](https://docs.python.org/3/library/asyncio.html) rather than
+   3rd party
    [gevent/greenlet](https://greenlet.readthedocs.io/en/latest/) so it
    is slightly more performant and efficient.
 
