@@ -45,8 +45,7 @@ Instead of specifying the target mappings on the command line as above,
 you can instead choose to configure them in `~/.config/corsproxy.toml`
 a/s per the instructions in the example
 [`corsproxy.toml`](corsproxy.toml) here. The file is convenient if you
-are starting the program via
-[systemd](https://www.freedesktop.org/wiki/Software/systemd/) etc. Proxy
+are starting the program via [systemd](https://systemd.io/) etc. Proxy
 mappings are only read from the file if none are specified on the
 command line.
 
@@ -97,12 +96,13 @@ $ ./corsproxy 8000=https://[2409:d001:4c04:3a10:4d5a:3061:db17:835]:9000
 
 ## Installation
 
-Requires `python` 3.7 or later and a modern Linux `systemd` environment
-(e.g. I use Arch Linux on a Raspberry Pi).
+Requires `python` 3.7 or later and any modern
+[systemd](https://systemd.io/)  based Linux environment. E.g. I run it
+on a [Raspberry Pi](https://www.raspberrypi.com/) using [Arch Linux
+ARM](https://archlinuxarm.org/).
 
-These instructions assume you are using
-[systemd](https://www.freedesktop.org/wiki/Software/systemd/) to start
-the application. A [systemd
+These instructions assume you are using [systemd](https://systemd.io/)
+to start the application. A [systemd
 service](https://www.freedesktop.org/software/systemd/man/systemd.service.html)
 service file is provided.
 

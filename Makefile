@@ -17,7 +17,7 @@ NAME = $(shell basename $(CURDIR))
 check:
 	ruff $(NAME)
 	shellcheck *.sh
-	vermin -i --no-tips $(NAME)
+	vermin -i -v --no-tips --exclude tomllib $(NAME)
 
 docker:
 	./docker.sh
