@@ -20,7 +20,7 @@ import re
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Tuple, DefaultDict
 from urllib.parse import urlsplit, urlunsplit
 
 import aiohttp
@@ -36,7 +36,7 @@ from starlette.routing import Route
 try:
     import tomllib
 except ModuleNotFoundError:
-    import tomli as tomllib  # type:ignore
+    import tomli as tomllib  # type: ignore
 
 # Get location of optional conf file
 CNFFILE = Path(os.getenv('XDG_CONFIG_HOME', '~/.config'),
@@ -47,7 +47,7 @@ DEFHOST = '0.0.0.0'
 
 def parse_targets(targets: List[str]) -> Iterable[Tuple[str, int, str]]:
     'Check and then yield each host, port, target in given list'
-    ports = defaultdict(set)
+    ports: DefaultDict = defaultdict(set)
     for t in targets:
         if '=' not in t:
             sys.exit(f'{t}: not in '
@@ -61,7 +61,7 @@ def parse_targets(targets: List[str]) -> Iterable[Tuple[str, int, str]]:
 
             # Handle IPv6 addresses enclosed in "[addr]"
             if lhost and lhost != '*':
-                host6 = re.search('\[(.+)\]', lhost)
+                host6 = re.search(r'\[(.+)\]', lhost)
                 host = host6.group(1) if host6 else lhost
 
         try:
@@ -74,7 +74,8 @@ def parse_targets(targets: List[str]) -> Iterable[Tuple[str, int, str]]:
 
         if portn in ports[host]:
             lhost = f'[{host}]' if ':' in host else host
-            sys.exit(f'Listening port {lhost}:{portn} specified more than once.')
+            sys.exit(f'Listening port {lhost}:{portn} '
+                     'specified more than once.')
 
         ports[host].add(portn)
         yield host, portn, target
@@ -151,14 +152,15 @@ async def get(request: Request) -> Response:
 
 # Set routes and middleware
 routes = [Route('/{path:path}', get, methods=('GET', 'POST', 'PUT',
-                                              'PATCH', 'DELETE', 'HEAD'))]
+                                              'PATCH', 'DELETE',
+                                              'HEAD'))]  # type: ignore
 middleware = [Middleware(CORSMiddleware, allow_origins=['*'],
                          allow_methods=['*'], allow_headers=['*'])]
 
 # Create the app instance
 app = Starlette(debug=args.debug, routes=routes, middleware=middleware)
 
-def run(host:str, port: int, target: str) -> None:
+def run(host: str, port: int, target: str) -> None:
     'Runs in a thread, one for each target'
     global mytarget
     mytarget = target

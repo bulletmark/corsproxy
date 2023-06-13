@@ -16,6 +16,9 @@ NAME = $(shell basename $(CURDIR))
 
 check:
 	ruff $(NAME)
+	flake8 $(NAME)
+	mypy $(NAME)
+	pyright $(NAME)
 	shellcheck *.sh
 	vermin -i -v --no-tips --exclude tomllib $(NAME)
 
