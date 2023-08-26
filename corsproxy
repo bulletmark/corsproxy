@@ -20,22 +20,22 @@ import re
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Iterable, List, Tuple, DefaultDict
+from typing import DefaultDict, Iterable, List, Tuple
 from urllib.parse import urlsplit, urlunsplit
 
 import aiohttp
-import uvicorn
+import uvicorn  # type: ignore
 from multidict import CIMultiDict
-from starlette.applications import Starlette
-from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
-from starlette.requests import Request
-from starlette.responses import Response
-from starlette.routing import Route
+from starlette.applications import Starlette  # type: ignore
+from starlette.middleware import Middleware  # type: ignore
+from starlette.middleware.cors import CORSMiddleware  # type: ignore
+from starlette.requests import Request  # type: ignore
+from starlette.responses import Response  # type: ignore
+from starlette.routing import Route  # type: ignore
 
-try:
+if sys.version_info >= (3, 11):
     import tomllib
-except ModuleNotFoundError:
+else:
     import tomli as tomllib  # type: ignore
 
 # Get location of optional conf file

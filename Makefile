@@ -20,7 +20,7 @@ check:
 	mypy $(NAME)
 	pyright $(NAME)
 	shellcheck *.sh
-	vermin -i -v --no-tips --exclude tomllib $(NAME)
+	vermin -i -vv --no-tips --exclude tomllib $(NAME)
 
 docker:
 	./docker.sh
