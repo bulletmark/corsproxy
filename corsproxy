@@ -25,6 +25,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 import aiohttp
 import uvicorn  # type: ignore
+import validators  # type: ignore
 from multidict import CIMultiDict
 from starlette.applications import Starlette  # type: ignore
 from starlette.middleware import Middleware  # type: ignore
@@ -71,6 +72,9 @@ def parse_targets(targets: List[str]) -> Iterable[Tuple[str, int, str]]:
 
         if not any(target.startswith(s) for s in SCHEMES):
             sys.exit(f'{t}: target must start with {" or ".join(SCHEMES)}')
+
+        if not validators.url(target):
+            sys.exit(f'Invalid target URL {target}.')
 
         if portn in ports[host]:
             lhost = f'[{host}]' if ':' in host else host
