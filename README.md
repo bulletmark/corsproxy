@@ -235,7 +235,7 @@ options:
                         default="~/.config/corsproxy.toml"
 ```
 
-## Version Major Version 2.0 Changes
+## Major Version 2.0 Changes
 
 1. **Incompatible Change:** HTTPS targets are now supported in addition
    to standard HTTP. This necessitates an incompatible change to how the
