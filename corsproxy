@@ -1,4 +1,4 @@
-#!venv/bin/python -u
+#!venv/bin/python
 '''
 A simple CORS proxy. Reads list of target server mappings from the
 command line, or from your config file. Target server mappings are of
@@ -170,7 +170,8 @@ def run(host: str, port: int, target: str) -> None:
     mytarget = target
 
     phost = f'[{host}]' if ':' in host else host
-    print(f'Starting proxy for http://{phost}:{port} -> {target}')
+    print(f'Starting proxy for http://{phost}:{port} -> {target}',
+          flush=True)
 
     log_level = 'debug' if args.debug else 'error'
     uvicorn.run(app, host=host, port=port, log_level=log_level,

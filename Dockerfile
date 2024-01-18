@@ -20,4 +20,4 @@ COPY --from=builder /install /usr/local/
 WORKDIR /app
 COPY . ./
 
-ENTRYPOINT ["python3", "-u", "corsproxy"]
+ENTRYPOINT ["python3", "corsproxy"]
