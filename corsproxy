@@ -1,4 +1,4 @@
-#!venv/bin/python
+#!.venv/bin/python
 '''
 A simple CORS proxy. Reads list of target server mappings from the
 command line, or from your config file. Target server mappings are of

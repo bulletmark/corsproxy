@@ -119,8 +119,8 @@ service file is provided.
 2. Create virtual environment (venv) and install service:
 
     ```sh
-    $ python3 -m venv venv
-    $ venv/bin/pip install -r requirements.txt
+    $ python3 -m venv .venv
+    $ .venv/bin/pip install -r requirements.txt
     $ sudo cp corsproxy.service /etc/systemd/system
     $ sudoedit /etc/systemd/system/corsproxy.service # Edit #TEMPLATE# values.
     ```
