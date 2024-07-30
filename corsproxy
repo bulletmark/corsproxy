@@ -14,13 +14,15 @@ address to limit to that interface. E.g. to listen all IPv4 and IPv6
 addresses and forward to same IPv4 server define 2 mappings:
 "0.0.0.0:8000=http://192.168.1.1" "[::]:8000=http://192.168.1.1".
 '''
+from __future__ import annotations
+
 import argparse
 import os
 import re
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import DefaultDict, Iterable, List, Tuple
+from typing import Iterable
 from urllib.parse import urlsplit, urlunsplit
 
 import aiohttp
@@ -46,9 +48,9 @@ CNFFILE = Path(os.getenv('XDG_CONFIG_HOME', '~/.config'),
 SCHEMES = ('http://', 'https://')
 DEFHOST = '0.0.0.0'
 
-def parse_targets(targets: List[str]) -> Iterable[Tuple[str, int, str]]:
+def parse_targets(targets: list[str]) -> Iterable[tuple[str, int, str]]:
     'Check and then yield each host, port, target in given list'
-    ports: DefaultDict = defaultdict(set)
+    ports: defaultdict = defaultdict(set)
     for t in targets:
         if '=' not in t:
             sys.exit(f'{t}: not in '
@@ -85,7 +87,7 @@ def parse_targets(targets: List[str]) -> Iterable[Tuple[str, int, str]]:
         yield host, portn, target
 
 # Process command line options
-opt = argparse.ArgumentParser(description=__doc__.strip())
+opt = argparse.ArgumentParser(description=__doc__)
 opt.add_argument('-d', '--debug', action='store_true',
                  help='enable debug output')
 opt.add_argument('-c', '--conffile',

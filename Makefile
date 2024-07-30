@@ -15,7 +15,7 @@
 NAME = $(shell basename $(CURDIR))
 
 check:
-	ruff $(NAME)
+	ruff check $(NAME)
 	flake8 $(NAME)
 	mypy $(NAME)
 	pyright $(NAME)
