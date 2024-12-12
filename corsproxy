@@ -172,8 +172,7 @@ def run(host: str, port: int, target: str) -> None:
     mytarget = target
 
     phost = f'[{host}]' if ':' in host else host
-    print(f'Starting proxy for http://{phost}:{port} -> {target}',
-          flush=True)
+    print(f'Starting proxy for http://{phost}:{port} -> {target}', flush=True)
 
     log_level = 'debug' if args.debug else 'error'
     uvicorn.run(app, host=host, port=port, log_level=log_level,
