@@ -167,7 +167,7 @@ middleware = [Middleware(CORSMiddleware, allow_origins=['*'],
 app = Starlette(debug=args.debug, routes=routes, middleware=middleware)
 
 def run(host: str, port: int, target: str) -> None:
-    'Runs in a thread, one for each target'
+    'Runs in a process, one for each target'
     global mytarget
     mytarget = target
 
