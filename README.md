@@ -98,8 +98,9 @@ $ ./corsproxy 8000=https://[2409:d001:4c04:3a10:4d5a:3061:db17:835]:9000
 
 Requires `python` 3.7 or later and any modern
 [systemd](https://systemd.io/)  based Linux environment. E.g. I run it
-on a [Raspberry Pi](https://www.raspberrypi.com/) using [Arch Linux
+on a [Raspberry Pi](https://raspberrypi.com/) using [Arch Linux
 ARM](https://archlinuxarm.org/).
+Also assumes the [`uv`](https://docs.astral.sh/uv) tool is installed.
 
 These instructions assume you are using [systemd](https://systemd.io/)
 to start the application. A [systemd
@@ -119,20 +120,11 @@ service file is provided.
 2. Create virtual environment (venv) and install service:
 
     ```sh
-    $ python3 -m venv .venv
-    $ .venv/bin/pip install -r requirements.txt
+    $ uv venv
+    $ uv pip install -r requirements.txt
     $ sudo cp corsproxy.service /etc/systemd/system
     $ sudoedit /etc/systemd/system/corsproxy.service # Edit #TEMPLATE# values.
     ```
-
-Note: Alternatively, to create the venv, install the requirement
-packages, insert the template values, and enable + start the service you
-can use my [pinstall](https://github.com/bulletmark/pinstall) tool. Just
-install it and do the following in the `corsproxy` directory.
-
-```sh
-$ pinstall venv
-$ pinstall service
 ```
 
 ## Starting, Stopping, And Status
@@ -230,7 +222,7 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   -d, --debug           enable debug output
-  -c CONFFILE, --conffile CONFFILE
+  -c, --conffile CONFFILE
                         alternative configuration file,
                         default="~/.config/corsproxy.toml"
 ```

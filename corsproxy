@@ -1,5 +1,5 @@
 #!.venv/bin/python
-'''
+"""
 A simple CORS proxy. Reads list of target server mappings from the
 command line, or from your config file. Target server mappings are of
 the form "[host:]port=http://server[:targetport]" or
@@ -13,7 +13,8 @@ limit to local IPv4 connections, or '[::]' for all IPv6 connections, or
 address to limit to that interface. E.g. to listen all IPv4 and IPv6
 addresses and forward to same IPv4 server define 2 mappings:
 "0.0.0.0:8000=http://192.168.1.1" "[::]:8000=http://192.168.1.1".
-'''
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -42,19 +43,20 @@ else:
     import tomli as tomllib  # type: ignore
 
 # Get location of optional conf file
-CNFFILE = Path(os.getenv('XDG_CONFIG_HOME', '~/.config'),
-        Path(sys.argv[0]).stem + '.toml')
+CNFFILE = Path(
+    os.getenv('XDG_CONFIG_HOME', '~/.config'), Path(sys.argv[0]).stem + '.toml'
+)
 
 SCHEMES = ('http://', 'https://')
 DEFHOST = '0.0.0.0'
 
+
 def parse_targets(targets: list[str]) -> Iterable[tuple[str, int, str]]:
-    'Check and then yield each host, port, target in given list'
+    "Check and then yield each host, port, target in given list"
     ports: defaultdict = defaultdict(set)
     for t in targets:
         if '=' not in t:
-            sys.exit(f'{t}: not in '
-                     '[host:]port=http://server[:targetport] format.')
+            sys.exit(f'{t}: not in [host:]port=http://server[:targetport] format.')
 
         port, target = t.split('=', maxsplit=1)
 
@@ -80,20 +82,19 @@ def parse_targets(targets: list[str]) -> Iterable[tuple[str, int, str]]:
 
         if portn in ports[host]:
             lhost = f'[{host}]' if ':' in host else host
-            sys.exit(f'Listening port {lhost}:{portn} '
-                     'specified more than once.')
+            sys.exit(f'Listening port {lhost}:{portn} specified more than once.')
 
         ports[host].add(portn)
         yield host, portn, target
 
+
 # Process command line options
 opt = argparse.ArgumentParser(description=__doc__)
-opt.add_argument('-d', '--debug', action='store_true',
-                 help='enable debug output')
-opt.add_argument('-c', '--conffile',
-                 help=f'alternative configuration file, default="{CNFFILE}"')
-opt.add_argument('targets', nargs='*',
-                 help='1 or more proxy target server mappings')
+opt.add_argument('-d', '--debug', action='store_true', help='enable debug output')
+opt.add_argument(
+    '-c', '--conffile', help=f'alternative configuration file, default="{CNFFILE}"'
+)
+opt.add_argument('targets', nargs='*', help='1 or more proxy target server mappings')
 
 args = opt.parse_args()
 
@@ -121,8 +122,9 @@ targets = list(parse_targets(targets))
 mytarget = None
 session = None
 
+
 async def get(request: Request) -> Response:
-    'Proxy the incoming network request'
+    "Proxy the incoming network request"
     # Allocate session first time
     global session
     if not session:
@@ -152,22 +154,28 @@ async def get(request: Request) -> Response:
     async with func as response:
         # Some servers have blank chars on end of key values which
         # Starlette does not like
-        hdr = CIMultiDict((k, v.strip())
-                          for k, v in response.headers.items())
+        hdr = CIMultiDict((k, v.strip()) for k, v in response.headers.items())
         return Response((await response.text()), response.status, hdr)
 
+
 # Set routes and middleware
-routes = [Route('/{path:path}', get, methods=('GET', 'POST', 'PUT',
-                                              'PATCH', 'DELETE',
-                                              'HEAD'))]  # type: ignore
-middleware = [Middleware(CORSMiddleware, allow_origins=['*'],
-                         allow_methods=['*'], allow_headers=['*'])]
+routes = [
+    Route(
+        '/{path:path}', get, methods=('GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD')
+    )
+]  # type: ignore
+middleware = [
+    Middleware(
+        CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*']
+    )
+]
 
 # Create the app instance
 app = Starlette(debug=args.debug, routes=routes, middleware=middleware)
 
+
 def run(host: str, port: int, target: str) -> None:
-    'Runs in a process, one for each target'
+    "Runs in a process, one for each target"
     global mytarget
     mytarget = target
 
@@ -175,8 +183,15 @@ def run(host: str, port: int, target: str) -> None:
     print(f'Starting proxy for http://{phost}:{port} -> {target}', flush=True)
 
     log_level = 'debug' if args.debug else 'error'
-    uvicorn.run(app, host=host, port=port, log_level=log_level,
-                server_header=False, date_header=False)
+    uvicorn.run(
+        app,
+        host=host,
+        port=port,
+        log_level=log_level,
+        server_header=False,
+        date_header=False,
+    )
+
 
 # Just run in same process if we only have a single proxy service
 # configured. Otherwise create and start a process for each service.
@@ -184,6 +199,7 @@ if len(targets) == 1:
     run(*targets[0])
 else:
     import multiprocessing
+
     for t in targets:
         multiprocessing.Process(target=run, args=(*t,)).start()
 
