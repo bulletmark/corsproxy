@@ -22,8 +22,8 @@ import os
 import re
 import sys
 from collections import defaultdict
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 from urllib.parse import urlsplit, urlunsplit
 
 import aiohttp
