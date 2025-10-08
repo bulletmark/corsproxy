@@ -1,7 +1,7 @@
-FROM python:3.11-slim as base
+FROM python:3.13-slim AS base
 LABEL name=corsproxy maintainer="mark.blakeney@bullet-systems.net"
 
-FROM base as builder
+FROM base AS builder
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential libffi-dev
 RUN mkdir /install
 WORKDIR /install
