@@ -77,7 +77,7 @@ def parse_targets(targets: list[str]) -> Iterable[tuple[str, int, str]]:
         if not any(target.startswith(s) for s in SCHEMES):
             sys.exit(f'{t}: target must start with {" or ".join(SCHEMES)}')
 
-        if not validators.url(target):
+        if not validators.url(target, simple_host=True):
             sys.exit(f'Invalid target URL {target}.')
 
         if portn in ports[host]:
