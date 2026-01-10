@@ -4,8 +4,7 @@ PYFILES = $(PYNAME)
 
 check::
 	ruff check $(PYFILES)
-	mypy $(PYFILES)
-	pyright $(PYFILES)
+	ty check $(PYFILES)
 	vermin -v --exclude tomllib -i --no-tips $(PYFILES)
 	md-link-checker
 

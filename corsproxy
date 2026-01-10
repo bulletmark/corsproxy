@@ -17,30 +17,30 @@ addresses and forward to same IPv4 server define 2 mappings:
 
 from __future__ import annotations
 
-import argparse
 import os
 import re
 import sys
+from argparse import ArgumentParser
 from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 import aiohttp
-import uvicorn  # type: ignore
-import validators  # type: ignore
+import uvicorn
+import validators
 from multidict import CIMultiDict
-from starlette.applications import Starlette  # type: ignore
-from starlette.middleware import Middleware  # type: ignore
-from starlette.middleware.cors import CORSMiddleware  # type: ignore
-from starlette.requests import Request  # type: ignore
-from starlette.responses import Response  # type: ignore
-from starlette.routing import Route  # type: ignore
+from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
+from starlette.routing import Route
 
 if sys.version_info >= (3, 11):
     import tomllib
 else:
-    import tomli as tomllib  # type: ignore
+    import tomli as tomllib
 
 # Get location of optional conf file
 CNFFILE = Path(
@@ -51,74 +51,6 @@ SCHEMES = ('http://', 'https://')
 DEFHOST = '0.0.0.0'
 
 
-def parse_targets(targets: list[str]) -> Iterable[tuple[str, int, str]]:
-    "Check and then yield each host, port, target in given list"
-    ports: defaultdict = defaultdict(set)
-    for t in targets:
-        if '=' not in t:
-            sys.exit(f'{t}: not in [host:]port=http://server[:targetport] format.')
-
-        port, target = t.split('=', maxsplit=1)
-
-        host = DEFHOST
-        if ':' in port:
-            lhost, port = port.rsplit(':', maxsplit=1)
-
-            # Handle IPv6 addresses enclosed in "[addr]"
-            if lhost and lhost != '*':
-                host6 = re.search(r'\[(.+)\]', lhost)
-                host = host6.group(1) if host6 else lhost
-
-        try:
-            portn = int(port)
-        except Exception:
-            sys.exit(f'{t}: port {port} must be integer.')
-
-        if not any(target.startswith(s) for s in SCHEMES):
-            sys.exit(f'{t}: target must start with {" or ".join(SCHEMES)}')
-
-        if not validators.url(target, simple_host=True):
-            sys.exit(f'Invalid target URL {target}.')
-
-        if portn in ports[host]:
-            lhost = f'[{host}]' if ':' in host else host
-            sys.exit(f'Listening port {lhost}:{portn} specified more than once.')
-
-        ports[host].add(portn)
-        yield host, portn, target
-
-
-# Process command line options
-opt = argparse.ArgumentParser(description=__doc__)
-opt.add_argument('-d', '--debug', action='store_true', help='enable debug output')
-opt.add_argument(
-    '-c', '--conffile', help=f'alternative configuration file, default="{CNFFILE}"'
-)
-opt.add_argument('targets', nargs='*', help='1 or more proxy target server mappings')
-
-args = opt.parse_args()
-
-# Read configuration file
-if args.conffile:
-    conffile = Path(args.conffile)
-    if not conffile.exists():
-        opt.error(f'Configuration file "{conffile}" does not exist.')
-else:
-    conffile = CNFFILE.expanduser()
-
-if conffile.exists():
-    # Get configuration values
-    with conffile.open('rb') as fp:
-        conf = tomllib.load(fp)
-else:
-    conf = {}
-
-# Read target definitions from file if not defined on command line
-targets = args.targets or conf.get('targets')
-if not targets:
-    sys.exit('No target server mappings defined.')
-
-targets = list(parse_targets(targets))
 mytarget = None
 session = None
 
@@ -163,26 +95,29 @@ routes = [
     Route(
         '/{path:path}', get, methods=('GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD')
     )
-]  # type: ignore
+]
 middleware = [
     Middleware(
-        CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*']
+        CORSMiddleware,  # type: ignore
+        allow_origins=['*'],
+        allow_methods=['*'],
+        allow_headers=['*'],
     )
 ]
 
-# Create the app instance
-app = Starlette(debug=args.debug, routes=routes, middleware=middleware)
 
-
-def run(host: str, port: int, target: str) -> None:
+def run(host: str, port: int, target: str, debug: bool) -> None:
     "Runs in a process, one for each target"
     global mytarget
     mytarget = target
 
+    # Create the app instance
+    app = Starlette(debug=debug, routes=routes, middleware=middleware)
+
     phost = f'[{host}]' if ':' in host else host
     print(f'Starting proxy for http://{phost}:{port} -> {target}', flush=True)
 
-    log_level = 'debug' if args.debug else 'error'
+    log_level = 'debug' if debug else 'error'
     uvicorn.run(
         app,
         host=host,
@@ -193,17 +128,92 @@ def run(host: str, port: int, target: str) -> None:
     )
 
 
-# Just run in same process if we only have a single proxy service
-# configured. Otherwise create and start a process for each service.
-if len(targets) == 1:
-    run(*targets[0])
-else:
-    import multiprocessing
-    multiprocessing.set_start_method('fork', force=True)
-
+def parse_targets(targets: list[str]) -> Iterable[tuple[str, int, str]]:
+    "Check and then yield each host, port, target in given list"
+    ports: defaultdict = defaultdict(set)
     for t in targets:
-        multiprocessing.Process(target=run, args=(*t,)).start()
+        if '=' not in t:
+            sys.exit(f'{t}: not in [host:]port=http://server[:targetport] format.')
 
-    # Wait for termination ..
-    for p in multiprocessing.active_children():
-        p.join()
+        port, target = t.split('=', maxsplit=1)
+
+        host = DEFHOST
+        if ':' in port:
+            lhost, port = port.rsplit(':', maxsplit=1)
+
+            # Handle IPv6 addresses enclosed in "[addr]"
+            if lhost and lhost != '*':
+                host6 = re.search(r'\[(.+)\]', lhost)
+                host = host6.group(1) if host6 else lhost
+
+        try:
+            portn = int(port)
+        except Exception:
+            sys.exit(f'{t}: port {port} must be integer.')
+
+        if not any(target.startswith(s) for s in SCHEMES):
+            sys.exit(f'{t}: target must start with {" or ".join(SCHEMES)}')
+
+        if not validators.url(target, simple_host=True):
+            sys.exit(f'Invalid target URL {target}.')
+
+        if portn in ports[host]:
+            lhost = f'[{host}]' if ':' in host else host
+            sys.exit(f'Listening port {lhost}:{portn} specified more than once.')
+
+        ports[host].add(portn)
+        yield host, portn, target
+
+
+def main() -> None:
+    # Process command line options
+    opt = ArgumentParser(description=__doc__)
+    opt.add_argument('-d', '--debug', action='store_true', help='enable debug output')
+    opt.add_argument(
+        '-c', '--conffile', help=f'alternative configuration file, default="{CNFFILE}"'
+    )
+    opt.add_argument(
+        'targets', nargs='*', help='1 or more proxy target server mappings'
+    )
+
+    args = opt.parse_args()
+
+    # Read configuration file
+    if args.conffile:
+        conffile = Path(args.conffile)
+        if not conffile.exists():
+            opt.error(f'Configuration file "{conffile}" does not exist.')
+    else:
+        conffile = CNFFILE.expanduser()
+
+    if conffile.exists():
+        # Get configuration values
+        with conffile.open('rb') as fp:
+            conf = tomllib.load(fp)
+    else:
+        conf = {}
+
+    # Read target definitions from file if not defined on command line
+    targets = args.targets or conf.get('targets', '')
+    if not targets:
+        sys.exit('No target server mappings defined.')
+
+    targets = list(parse_targets(targets))
+
+    # Just run in same process if we only have a single proxy service
+    # configured. Otherwise create and start a process for each service.
+    if len(targets) == 1:
+        run(*targets[0], args.debug)
+    else:
+        import multiprocessing
+
+        for t in targets:
+            multiprocessing.Process(target=run, args=(*t, args.debug)).start()
+
+        # Wait for termination ..
+        for p in multiprocessing.active_children():
+            p.join()
+
+
+if __name__ == '__main__':
+    main()
