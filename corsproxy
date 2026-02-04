@@ -17,7 +17,6 @@ addresses and forward to same IPv4 server define 2 mappings:
 
 from __future__ import annotations
 
-import os
 import re
 import sys
 from argparse import ArgumentParser
@@ -27,6 +26,7 @@ from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 import aiohttp
+import platformdirs
 import uvicorn
 import validators
 from multidict import CIMultiDict
@@ -43,9 +43,7 @@ else:
     import tomli as tomllib
 
 # Get location of optional conf file
-CNFFILE = Path(
-    os.getenv('XDG_CONFIG_HOME', '~/.config'), Path(sys.argv[0]).stem + '.toml'
-)
+CNFFILE = platformdirs.user_config_path() / (Path(sys.argv[0]).stem + '.toml')
 
 SCHEMES = ('http://', 'https://')
 DEFHOST = '0.0.0.0'
