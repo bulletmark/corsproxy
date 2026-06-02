@@ -64,7 +64,10 @@ async def get(request: Request) -> Response:
     url = urlunsplit(urlsplit(str(request.url))._replace(scheme='', netloc=''))
 
     method = request.method
-    hdr = request.headers
+    # Create mutable copy of headers and remove Host header so aiohttp
+    # sets it correctly based on the target URL instead of forwarding
+    # the client's Host header
+    hdr = {k: v for k, v in request.headers.items() if k.lower() != 'host'}
 
     if method == 'GET':
         func = session.get(url, headers=hdr)
