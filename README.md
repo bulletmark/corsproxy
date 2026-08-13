@@ -224,7 +224,7 @@ options:
   -d, --debug           enable debug output
   -c, --conffile CONFFILE
                         alternative configuration file,
-                        default="~/.config/corsproxy.toml"
+                        default="$HOME/.config/corsproxy.toml"
 ```
 
 ## Major Version 2.0 Changes

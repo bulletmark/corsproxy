@@ -12,7 +12,7 @@ docker::
 	./docker.sh
 
 doc::
-	update-readme-usage
+	update-readme-usage -c ".venv/bin/python $(NAME)"
 
 format::
 	ruff check --select I --fix $(PYFILES) && ruff format $(PYFILES)
