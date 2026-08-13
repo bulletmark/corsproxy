@@ -1,9 +1,11 @@
 [tool.ruff.format]
 quote-style = "single"
-skip-magic-trailing-comma = true
 
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
+
+[tool.ruff.lint]
+ignore = ["SIM115", "SIM905", "BLE001", "PLW1510", "S110"]
 
 # vim:se sw=2:

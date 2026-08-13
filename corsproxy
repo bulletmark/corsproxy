@@ -99,7 +99,7 @@ routes = [
 ]
 middleware = [
     Middleware(
-        CORSMiddleware,  # type: ignore
+        CORSMiddleware,
         allow_origins=['*'],
         allow_methods=['*'],
         allow_headers=['*'],
