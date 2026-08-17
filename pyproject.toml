@@ -1,11 +1,7 @@
 [tool.ruff.format]
 quote-style = "single"
 
-[tool.pyright]
-venvPath = "."
-venv = ".venv"
-
 [tool.ruff.lint]
-ignore = ["SIM115", "SIM905", "BLE001", "PLW1510", "S110"]
+ignore = ["SIM115", "SIM905", "BLE001", "PLW1510", "S110", "DTZ"]
 
 # vim:se sw=2:
